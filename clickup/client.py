@@ -1,71 +1,64 @@
-from http import client
-import sys
-
 import json
-from clickuppython import exceptions
-from django import VERSION
-from django.shortcuts import redirect
-from .response import Response
+from clickup import exceptions
+from clickup.response import Response
 from urllib.parse import urlencode
 
 import requests
 
+
 class Client(object):
-    BASE_URL = 'https://api.clickup.com/api/'
+    BASE_URL = "https://api.clickup.com/api/"
     AUTH_URL = "https://app.clickup.com/api"
     VERSION = "v2"
 
-    WORKSPACE = BASE_URL + VERSION + '/team'
-    SPACE = BASE_URL + VERSION + '/team/{team_id}/space'
-    FOLDER = BASE_URL + VERSION + '/space/{space_id}/folder'
-    LIST = BASE_URL + VERSION + '/folder/{folder_id}/list'
-    TASK = BASE_URL + VERSION + '/list/{list_id}/task'
-    WEBHOOK = BASE_URL + VERSION + '/team/{team_id}/webhook'
-    DEL_WEBHOOK = BASE_URL + VERSION +"/webhook/{webhook_id}"
-    REQUEST_TOKEN = BASE_URL + VERSION + '/oauth/token'
-    
+    WORKSPACE = BASE_URL + VERSION + "/team"
+    SPACE = BASE_URL + VERSION + "/team/{team_id}/space"
+    FOLDER = BASE_URL + VERSION + "/space/{space_id}/folder"
+    LIST = BASE_URL + VERSION + "/folder/{folder_id}/list"
+    TASK = BASE_URL + VERSION + "/list/{list_id}/task"
+    WEBHOOK = BASE_URL + VERSION + "/team/{team_id}/webhook"
+    DEL_WEBHOOK = BASE_URL + VERSION + "/webhook/{webhook_id}"
+    REQUEST_TOKEN = BASE_URL + VERSION + "/oauth/token"
+
     EVENTS = [
-            "taskCreated",
-            "taskUpdated",
-            "taskDeleted",
-            "taskPriorityUpdated",
-            "taskStatusUpdated",
-            "taskAssigneeUpdated",
-            "taskDueDateUpdated",
-            "taskTagUpdated",
-            "taskMoved",
-            "taskCommentPosted",
-            "taskCommentUpdated",
-            "taskTimeEstimateUpdated",
-            "taskTimeTrackedUpdated",
-            "listCreated",
-            "listUpdated",
-            "listDeleted",
-            "folderCreated",
-            "folderUpdated",
-            "folderDeleted",
-            "spaceCreated",
-            "spaceUpdated",
-            "spaceDeleted",
-            "goalCreated",
-            "goalUpdated",
-            "goalDeleted",
-            "keyResultCreated",
-            "keyResultUpdated",
-            "keyResultDeleted"
-        ]
-    def __init__(self, client_id:str, client_secret:str) -> None:
+        "taskCreated",
+        "taskUpdated",
+        "taskDeleted",
+        "taskPriorityUpdated",
+        "taskStatusUpdated",
+        "taskAssigneeUpdated",
+        "taskDueDateUpdated",
+        "taskTagUpdated",
+        "taskMoved",
+        "taskCommentPosted",
+        "taskCommentUpdated",
+        "taskTimeEstimateUpdated",
+        "taskTimeTrackedUpdated",
+        "listCreated",
+        "listUpdated",
+        "listDeleted",
+        "folderCreated",
+        "folderUpdated",
+        "folderDeleted",
+        "spaceCreated",
+        "spaceUpdated",
+        "spaceDeleted",
+        "goalCreated",
+        "goalUpdated",
+        "goalDeleted",
+        "keyResultCreated",
+        "keyResultUpdated",
+        "keyResultDeleted",
+    ]
+
+    def __init__(self, client_id: str, client_secret: str) -> None:
         self.token = None
         self.client_id = client_id
         self.client_secret = client_secret
 
     def authorization_url(self, redirect_uri: str) -> str:
-        params = {
-            "client_id" : self.client_id,
-            "client_secret" : self.client_secret,
-            "redirect_uri" : redirect_uri
-        }        
-        url = self.AUTH_URL+ '?' + urlencode(params)
+        params = {"client_id": self.client_id, "client_secret": self.client_secret, "redirect_uri": redirect_uri}
+        url = self.AUTH_URL + "?" + urlencode(params)
         return url
 
     def exchange_code(self, code: str) -> Response:
@@ -80,13 +73,9 @@ class Client(object):
         Returns:
             Response: _description_
         """
-        data = json.dumps({
-            "client_id": self.client_id,
-            "client_secret": self.client_secret,
-            "code": code
-        })
+        data = json.dumps({"client_id": self.client_id, "client_secret": self.client_secret, "code": code})
         response = self._post(self.REQUEST_TOKEN, data=data)
-        #response = self._parse(requests.request(method, url, headers=_headers, **kwargs))
+        # response = self._parse(requests.request(method, url, headers=_headers, **kwargs))
         return response
 
     def set_token(self, token: dict) -> None:
@@ -96,7 +85,7 @@ class Client(object):
         """
         self.token = token
 
-    def get_workspace(self)->dict:
+    def get_workspace(self) -> dict:
         """Return Team ID
         {
             "teams":[
@@ -131,7 +120,7 @@ class Client(object):
         response = self._get(self.WORKSPACE)
         return response
 
-    def get_spaces(self, team_id:str)->dict:        
+    def get_spaces(self, team_id: str) -> dict:
         """Return the spaces list
         {
         "spaces":[
@@ -248,11 +237,11 @@ class Client(object):
         Returns:
             dict: spaces
         """
-        
+
         response = self._get(self.SPACE.format(team_id=team_id))
         return response
 
-    def get_folder(self, space_id:str)->dict:        
+    def get_folder(self, space_id: str) -> dict:
         """Return the folders list
         {
         "folders":[
@@ -269,7 +258,7 @@ class Client(object):
                 "task_count":"1",
                 "archived":false,
                 "statuses":[
-                    
+
                 ],
                 "lists":[
                     {
@@ -325,11 +314,11 @@ class Client(object):
         Returns:
             dict: folders
         """
-        
+
         response = self._get(self.FOLDER.format(space_id=space_id))
         return response
 
-    def get_list(self, folder_id:str)->dict:
+    def get_list(self, folder_id: str) -> dict:
         """Return lists of list
         {
         "lists":[
@@ -366,11 +355,11 @@ class Client(object):
         Returns:
             list: dict of lists
         """
-        
+
         response = self._get(self.LIST.format(folder_id=folder_id))
         return response
 
-    def get_task(self, list_id:str)->dict: 
+    def get_task(self, list_id: str) -> dict:
         """Return the list of the current task inside of a list
         {
         "tasks":[
@@ -409,13 +398,13 @@ class Client(object):
                     }
                 ],
                 "watchers":[
-                    
+
                 ],
                 "checklists":[
-                    
+
                 ],
                 "tags":[
-                    
+
                 ],
                 "parent":"None",
                 "priority":"None",
@@ -424,13 +413,13 @@ class Client(object):
                 "points":"None",
                 "time_estimate":"None",
                 "custom_fields":[
-                    
+
                 ],
                 "dependencies":[
-                    
+
                 ],
                 "linked_tasks":[
-                    
+
                 ],
                 "team_id":"31016756",
                 "url":"https://app.clickup.com/t/25d7z4v",
@@ -464,11 +453,11 @@ class Client(object):
         Returns:
             dict: task
         """
-        
+
         response = self._get(self.TASK.format(list_id=list_id))
         return response
-    
-    def create_task(self, list_id, data:dict):
+
+    def create_task(self, list_id, data: dict):
         """assignees is an array of the assignees' user ids to be added to this task. You can view the available user ids using the Get Teams (Workspaces) call.
         example:
         {
@@ -511,19 +500,16 @@ class Client(object):
         url = self.TASK.format(list_id=list_id)
         data = json.dumps(data)
         response = self._post(url=url, data=data)
-        return response    
+        return response
 
-    def update_task(self, task_id:str, status:str):
-        url = self.BASE_URL+ self.VERSION + '/task/' + task_id
-        
-        data = json.dumps(
-            {
-            "status": status
-        })
+    def update_task(self, task_id: str, status: str):
+        url = self.BASE_URL + self.VERSION + "/task/" + task_id
+
+        data = json.dumps({"status": status})
         response = self._put(url=url, data=data)
         return response
 
-    def create_webhook(self, task_id:str, team_id:str, endpoint:str, event:str)->bool:
+    def create_webhook(self, task_id: str, team_id: str, endpoint: str, event: str) -> bool:
         """Creates a webhook based on task changes
         {
             {
@@ -571,16 +557,11 @@ class Client(object):
         Returns:
             bool: _description_
         """
-        payload = json.dumps(
-            {
-            "endpoint": endpoint,
-            "events": [event],
-            "task_id": task_id 
-        })
+        payload = json.dumps({"endpoint": endpoint, "events": [event], "task_id": task_id})
         response = self._post(url=self.WEBHOOK.format(team_id=team_id), data=payload)
         return response
 
-    def delete_webhook(self, webhook_id:str)->bool:
+    def delete_webhook(self, webhook_id: str) -> bool:
         """Deletes webhook using ID
 
         Args:
@@ -593,8 +574,8 @@ class Client(object):
         return response
 
     def _get(self, url, **kwargs) -> Response:
-            response = self._do_get(url, **kwargs)
-            return response
+        response = self._do_get(url, **kwargs)
+        return response
 
     def _do_get(self, url, **kwargs) -> Response:
         return self._request("GET", url, **kwargs)
@@ -613,19 +594,19 @@ class Client(object):
 
     def _request(self, method, url, headers=None, **kwargs) -> Response:
         _headers = {
-            'Authorization': 'Bearer {}'.format(self.token),
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            "Authorization": "Bearer {}".format(self.token),
+            "Accept": "application/json",
+            "Content-Type": "application/json",
         }
         if headers:
             _headers.update(headers)
         return self._parse(requests.request(method, url, headers=_headers, **kwargs))
 
     def _parse(self, response) -> Response:
-        
+
         status_code = response.status_code
 
-        if 'Content-Type' in response.headers and 'application/json' in response.headers['Content-Type']:
+        if "Content-Type" in response.headers and "application/json" in response.headers["Content-Type"]:
             r = response.json()
         else:
             r = response.content
