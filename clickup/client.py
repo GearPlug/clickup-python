@@ -15,7 +15,8 @@ class Client(object):
     SPACE = BASE_URL + VERSION + "/team/{team_id}/space"
     FOLDER = BASE_URL + VERSION + "/space/{space_id}/folder"
     LIST = BASE_URL + VERSION + "/folder/{folder_id}/list"
-    TASK = BASE_URL + VERSION + "/list/{list_id}/task"
+    TASKS = BASE_URL + VERSION + "/list/{list_id}/task"
+    TASK = BASE_URL + VERSION + "/task/{task_id}"
     WEBHOOK = BASE_URL + VERSION + "/team/{team_id}/webhook"
     DEL_WEBHOOK = BASE_URL + VERSION + "/webhook/{webhook_id}"
     REQUEST_TOKEN = BASE_URL + VERSION + "/oauth/token"
@@ -359,7 +360,20 @@ class Client(object):
         response = self._get(self.LIST.format(folder_id=folder_id))
         return response
 
-    def get_task(self, list_id: str) -> dict:
+    def get_task(self, task_id: str) -> dict:
+        """Return single task
+
+        Args:
+            task_id (_type_): _description_
+
+        Returns:
+            dict: task
+        """
+
+        response = self._get(self.TASK.format(task_id=task_id))
+        return response
+
+    def get_tasks(self, list_id: str) -> dict:
         """Return the list of the current task inside of a list
         {
         "tasks":[
@@ -454,7 +468,7 @@ class Client(object):
             dict: task
         """
 
-        response = self._get(self.TASK.format(list_id=list_id))
+        response = self._get(self.TASKS.format(list_id=list_id))
         return response
 
     def create_task(self, list_id, data: dict):
@@ -497,7 +511,7 @@ class Client(object):
         Returns:
             _type_: _description_
         """
-        url = self.TASK.format(list_id=list_id)
+        url = self.TASKS.format(list_id=list_id)
         data = json.dumps(data)
         response = self._post(url=url, data=data)
         return response
