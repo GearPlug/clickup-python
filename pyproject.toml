@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "clickup-python"
-version = "1.0.2"
+version = "1.0.3"
 description = "API wrapper for ClickUp written in Python"
 authors = ["Miguel Ferrer <ingferrermiguel@gmail.com>"]
 license = "MIT"
