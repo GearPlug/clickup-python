@@ -16,6 +16,8 @@ class Client(object):
     FOLDER = BASE_URL + VERSION + "/space/{space_id}/folder"
     LIST = BASE_URL + VERSION + "/folder/{folder_id}/list"
     TASKS = BASE_URL + VERSION + "/list/{list_id}/task"
+    MEMBERS = BASE_URL + VERSION + "/list/{list_id}/member"
+    CUSTOM_FIELDS = BASE_URL + VERSION + "/list/{list_id}/field"
     TASK = BASE_URL + VERSION + "/task/{task_id}"
     WEBHOOK = BASE_URL + VERSION + "/team/{team_id}/webhook"
     DEL_WEBHOOK = BASE_URL + VERSION + "/webhook/{webhook_id}"
@@ -373,7 +375,7 @@ class Client(object):
         response = self._get(self.TASK.format(task_id=task_id))
         return response
 
-    def get_tasks(self, list_id: str) -> dict:
+    def get_tasks(self, list_id: str, params: list = None) -> dict:
         """Return the list of the current task inside of a list
         {
         "tasks":[
@@ -463,12 +465,88 @@ class Client(object):
         }
         Args:
             list_id (_type_): _description_
+            params (list): list of params
 
         Returns:
             dict: task
         """
 
-        response = self._get(self.TASKS.format(list_id=list_id))
+        if params:
+            response = self._get(self.TASKS.format(list_id=list_id) + f"?custom_fields={json.dumps(params)}")
+        else:
+            response = self._get(self.TASKS.format(list_id=list_id))
+        return response
+
+    def get_members(self, list_id: str) -> dict:
+        """Return the list of the current members inside of a list
+        {
+          'members': [
+            {
+              'id': 84869277,
+              'username': 'Jhon Doe',
+              'email': 'Jhon@gmail.com',
+              'color': '',
+              'initials': 'JD',
+              'profilePicture': None,
+              'profileInfo': {
+                'display_profile': None,
+                'verified_ambassador': None,
+                'verified_consultant': None,
+                'top_tier_user': None,
+                'viewed_verified_ambassador': None,
+                'viewed_verified_consultant': None,
+                'viewed_top_tier_user': None
+              }
+            }
+          ]
+        }
+        Args:
+            list_id (_type_): _description_
+
+        Returns:
+            dict: members
+        """
+        response = self._get(self.MEMBERS.format(list_id=list_id))
+        return response
+
+    def get_custom_fields(self, list_id: str) -> dict:
+        """Return the list of the current task inside of a list
+        {
+          'fields': [
+            {
+              'id': '624e56f6-62b8-4593-be83-f1ed4cd147dc',
+              'name': 'Jhon Doe',
+              'type': 'drop_down',
+              'type_config': {
+                'options': [
+                  {
+                    'id': '97d85961-1437-4e17-881c-1db1501ccb9a',
+                    'name': 'Algo 1',
+                    'color': None,
+                    'orderindex': 0
+                  },
+                  {
+                    'id': '8ea9498e-1f0c-4264-b0c9-49565bc08fb3',
+                    'name': 'Algo 2',
+                    'color': None,
+                    'orderindex': 1
+                  }
+                ]
+              },
+              'date_created': '1712686424346',
+              'hide_from_guests': False,
+              'required': False
+            }
+          ]
+        }
+        Args:
+            list_id (_type_): _description_
+
+        Returns:
+            dict: task
+        """
+
+        response = self._get(self.CUSTOM_FIELDS.format(list_id=list_id))
         return response
 
     def create_task(self, list_id, data: dict):
