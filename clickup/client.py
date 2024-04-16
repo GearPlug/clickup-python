@@ -79,10 +79,10 @@ class Client(object):
         # response = self._parse(requests.request(method, url, headers=_headers, **kwargs))
         return response
 
-    def set_token(self, token: dict) -> None:
-        """Sets the User token for its use in this library.
+    def set_token(self, token: str) -> None:
+        """Sets the access_token for its use in this library.
         Args:
-            token (dict): User token data.
+            token (str): access_token data.
         """
         self.token = token
 
